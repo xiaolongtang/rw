@@ -1,0 +1,17 @@
+{
+  "language": ["de"],
+  "de": {
+    "keyboard": "German",
+    "Unit": [
+      {
+        "unit1": [
+          {
+            "statement": "Kaffee oder Tee",
+            "translate": "咖啡还是茶",
+            "keywords": ["Tee", "oder"]
+          }
+        ]
+      }
+    ]
+  }
+}
