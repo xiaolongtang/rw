@@ -10,7 +10,6 @@ import {
   Progress,
   Result,
   Space,
-  Tag,
   Typography,
   Input,
   Spin
@@ -30,6 +29,24 @@ import { getUnitProgress, saveUnitProgress } from '../services/progressService';
 import { recordSession } from '../services/statsService';
 
 const { Title, Text } = Typography;
+
+function splitStatementWithBlank(statement: string, keyword?: string) {
+  if (!statement) {
+    return { before: '', after: '', matched: false };
+  }
+  if (!keyword) {
+    return { before: statement, after: '', matched: false };
+  }
+  const idx = statement.indexOf(keyword);
+  if (idx === -1) {
+    return { before: `${statement} `, after: '', matched: false };
+  }
+  return {
+    before: statement.slice(0, idx),
+    after: statement.slice(idx + keyword.length),
+    matched: true
+  };
+}
 
 const QuizPage: React.FC = () => {
   const { language, unit } = useParams<{ language: string; unit: string }>();
@@ -52,6 +69,8 @@ const QuizPage: React.FC = () => {
   const [retryCount, setRetryCount] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [startAt] = useState(() => Date.now());
+  const [pendingQueue, setPendingQueue] = useState<QuizItem[] | null>(null);
+  const [locked, setLocked] = useState(false);
 
   const languageNode = useMemo(
     () => (language && dataset ? getLanguageNode(dataset, language) : undefined),
@@ -113,6 +132,17 @@ const QuizPage: React.FC = () => {
     }
   }, [queue.length, loading, completed, totalItems, language, unit, startAt, wrongCount, retryCount, message]);
 
+  const currentItem = queue[0];
+  const currentQuestion = currentItem ? questions[currentItem.questionIndex] : undefined;
+  const hiddenKeyword =
+    currentQuestion && currentQuestion.keywords ? currentQuestion.keywords[currentItem.keywordIndex] : '';
+  const statementParts = splitStatementWithBlank(currentQuestion?.statement || '', hiddenKeyword);
+  const inputWidth = Math.min(Math.max((hiddenKeyword?.length || 3) * 14, 160), 360);
+
+  useEffect(() => {
+    setFeedback(undefined);
+  }, [currentItem?.questionIndex, currentItem?.keywordIndex]);
+
   if (!languageNode || !unit) {
     return <Alert type="error" showIcon message="未找到语言或单元" />;
   }
@@ -151,35 +181,43 @@ const QuizPage: React.FC = () => {
     );
   }
 
-  const currentItem = queue[0];
-  const currentQuestion = currentItem ? questions[currentItem.questionIndex] : undefined;
-  const hiddenKeyword =
-    currentQuestion && currentQuestion.keywords ? currentQuestion.keywords[currentItem.keywordIndex] : '';
-
   const handleSubmit = async (asSkip = false) => {
-    if (!currentItem || !currentQuestion) return;
+    if (!currentItem || !currentQuestion || locked) return;
     const normalized = answer.trim();
     const isCorrect = !asSkip && normalized === hiddenKeyword;
     setSubmitting(true);
+    const restQueue = queue.slice(1);
     if (isCorrect) {
       const nextMastered = markMastered(masteredMap, currentItem);
-      const nextQueue = queue.slice(1);
       setMasteredMap(nextMastered);
-      setQueue(nextQueue);
+      setQueue(restQueue);
       setFeedback({ status: 'correct', answer: hiddenKeyword });
       setAnswer('');
       setShowStatement(false);
     } else {
       setWrongCount((w) => w + 1);
       setRetryCount((r) => r + 1);
-      const restQueue = queue.slice(1);
       const nextQueue = requeueItem(restQueue, currentItem);
-      setQueue(nextQueue);
+      setPendingQueue(nextQueue);
+      setLocked(true);
       setFeedback({ status: 'wrong', answer: hiddenKeyword, statement: currentQuestion.statement });
       setAnswer('');
       setShowStatement(false);
     }
     setSubmitting(false);
+  };
+
+  const handleNext = () => {
+    if (pendingQueue) {
+      setQueue(pendingQueue);
+      setPendingQueue(null);
+    } else {
+      setQueue((q) => q.slice(1));
+    }
+    setLocked(false);
+    setFeedback(undefined);
+    setAnswer('');
+    setShowStatement(false);
   };
 
   const mastered = masteredCount(masteredMap);
@@ -199,9 +237,9 @@ const QuizPage: React.FC = () => {
             <Progress
               percent={totalItems ? Math.round((mastered / totalItems) * 100) : 0}
               size="small"
-              style={{ width: 180 }}
+              style={{ width: 200, marginBottom: 12 }}
             />
-            <Text type="secondary">
+            <Text type="secondary" style={{ display: 'block', marginTop: 10 }}>
               {mastered}/{totalItems} 已掌握
             </Text>
           </div>
@@ -216,32 +254,24 @@ const QuizPage: React.FC = () => {
             <Title level={4} style={{ margin: 0 }}>
               {currentQuestion.translate}
             </Title>
-            <div className="quiz-keywords">
-              {currentQuestion.keywords.map((kw, idx) => {
-                if (idx === currentItem.keywordIndex) {
-                  return (
-                    <Input
-                      key={idx}
-                    value={answer}
-                    autoFocus
-                    onChange={(e) => setAnswer(e.target.value)}
-                    onPressEnter={() => handleSubmit(false)}
-                    placeholder="请输入缺失关键词"
-                    lang={language}
-                      autoCorrect="off"
-                      autoCapitalize="none"
-                      spellCheck={false}
-                      inputMode="text"
-                      style={{ maxWidth: 240 }}
-                    />
-                  );
-                }
-                return (
-                  <Tag key={idx} color="blue">
-                    {kw}
-                  </Tag>
-                );
-              })}
+            <Text type="secondary">填空</Text>
+            <div className="quiz-statement">
+              <Text className="quiz-statement-text">{statementParts.before}</Text>
+              <Input
+                value={answer}
+                autoFocus
+                onChange={(e) => setAnswer(e.target.value)}
+                onPressEnter={() => handleSubmit(false)}
+                placeholder="请输入缺失关键词"
+                lang={language}
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                inputMode="text"
+                style={{ width: inputWidth }}
+                disabled={locked}
+              />
+              <Text className="quiz-statement-text">{statementParts.after}</Text>
             </div>
             {showStatement && (
               <Alert
@@ -269,12 +299,22 @@ const QuizPage: React.FC = () => {
               />
             )}
             <Flex gap={8}>
-              <Button type="primary" onClick={() => handleSubmit(false)} loading={submitting} disabled={!answer && !submitting}>
+              <Button
+                type="primary"
+                onClick={() => handleSubmit(false)}
+                loading={submitting}
+                disabled={(!answer && !submitting) || locked}
+              >
                 提交
               </Button>
-              <Button onClick={() => handleSubmit(true)} disabled={submitting}>
+              <Button onClick={() => handleSubmit(true)} disabled={submitting || locked}>
                 我不会/跳过
               </Button>
+              {locked && pendingQueue && (
+                <Button type="dashed" onClick={handleNext}>
+                  下一题
+                </Button>
+              )}
               <Button type="link" onClick={() => setShowStatement((v) => !v)}>
                 {showStatement ? '隐藏原句' : '显示原句'}
               </Button>
