@@ -6,9 +6,56 @@
       {
         "unit1": [
           {
-            "statement": "Kaffee oder Tee",
-            "translate": "咖啡还是茶",
+            "statement": "Hallo, Tee oder Kaffee?",
+            "translate": "你好，茶还是咖啡？",
             "keywords": ["Tee", "oder"]
+          },
+          {
+            "statement": "Tee mit Milch, bitte!",
+            "translate": "请给我茶配牛奶！",
+            "keywords": ["mit", "Milch", "bitte"]
+          },
+          {
+            "statement": "Kaffee mit Zucker, bitte.",
+            "translate": "请给我加糖的咖啡。",
+            "keywords": ["Zucker"]
+          },
+          {
+            "statement": "Kekse und Kaffee, bitte!",
+            "translate": "饼干和咖啡，请！",
+            "keywords": ["Kekse"]
+          },
+          {
+            "statement": "Danke und tschüss!",
+            "translate": "谢谢，再见！",
+            "keywords": ["Danke", "tschüss"]
+          }
+        ],
+        "unit2": [
+          {
+            "statement": "Hallo, ich bin Anna.",
+            "translate": "你好，我是安娜。",
+            "keywords": ["ich", "bin"]
+          },
+          {
+            "statement": "Ich komme aus Tokio.",
+            "translate": "我来自东京。",
+            "keywords": ["komme", "aus", "Tokio"]
+          },
+          {
+            "statement": "Hallo, freut mich!",
+            "translate": "你好，很高兴认识你！",
+            "keywords": ["freut", "mich"]
+          },
+          {
+            "statement": "Und du, David?",
+            "translate": "你呢，大卫？",
+            "keywords": ["du"]
+          },
+          {
+            "statement": "Toronto oder Paris?",
+            "translate": "多伦多还是巴黎？",
+            "keywords": ["Toronto"]
           }
         ]
       }
