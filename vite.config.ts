@@ -2,33 +2,39 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
+const base = '/rw/';
+
 export default defineConfig({
+  base,
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png'],
+      // Disable minification of the generated service worker to avoid terser hook hanging.
+      minify: false,
       manifest: {
         name: 'Word PWA',
         short_name: 'Word PWA',
         description: 'Offline-first vocabulary practice PWA',
         theme_color: '#1677ff',
         background_color: '#ffffff',
+        start_url: base,
+        scope: base,
         display: 'standalone',
-        start_url: '/',
         icons: [
           {
-            src: '/icons/icon-192.png',
+            src: 'icons/icon-192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/icons/icon-512.png',
+            src: 'icons/icon-512.png',
             sizes: '512x512',
             type: 'image/png'
           },
           {
-            src: '/icons/icon.svg',
+            src: 'icons/icon.svg',
             sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'any maskable'
@@ -36,6 +42,8 @@ export default defineConfig({
         ]
       },
       workbox: {
+        // Use development mode to avoid terser hanging when bundling the SW under Node 22.
+        mode: 'development',
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
         runtimeCaching: [
           {
