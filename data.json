@@ -29,6 +29,11 @@
             "statement": "Danke und tschüss!",
             "translate": "谢谢，再见！",
             "keywords": ["Danke", "tschüss"]
+          },
+          {
+            "statement": "Wasser, bitte!",
+            "translate": "请给我水！",
+            "keywords": ["Wasser"]
           }
         ],
         "unit2": [
@@ -56,6 +61,80 @@
             "statement": "Toronto oder Paris?",
             "translate": "多伦多还是巴黎？",
             "keywords": ["Toronto"]
+          }
+        ],
+        "unit3": [
+          {
+            "statement": "Hallo, das ist meine Mama, Anna.",
+            "translate": "你好，这是我的妈妈，安娜。",
+            "keywords": ["das", "meine"]
+          },
+          {
+            "statement": "Das ist meine Schwester, Lisa.",
+            "translate": "这是我的姐姐，丽莎。",
+            "keywords": ["Schwester", "meine"]
+          },
+          {
+            "statement": "Mein Bruder ist lustig!",
+            "translate": "我的兄弟很有趣！",
+            "keywords": ["Mein", "Bruder", "lustig"]
+          },
+          {
+            "statement": "Ich bin Alex.",
+            "translate": "我是Alex。",
+            "keywords": ["Ich"]
+          },
+          {
+            "statement": "Meine Tochter ist nett.",
+            "translate": "我的女儿很和蔼。",
+            "keywords": ["Meine", "Tochter", "nett"]
+          },
+          {
+            "statement": "Das ist mein Sohn, Tom.",
+            "translate": "这是我的儿子，Tom。",
+            "keywords": ["mein", "Sohn"]
+          }
+        ],
+        "unit4": [
+          {
+            "statement": "Ich bin hungrig.",
+            "translate": "我饿了。",
+            "keywords": ["hungrig"]
+          },
+          {
+            "statement": "Das Restaurant ist gut und billig.",
+            "translate": "餐馆很好而且便宜。",
+            "keywords": ["Das", "gut", "billig"]
+          },
+          {
+            "statement": "Die Pizza ist lecker.",
+            "translate": "披萨很美味。",
+            "keywords": ["Die", "lecker"]
+          },
+          {
+            "statement": "Der Salat ist frisch.",
+            "translate": "沙拉是新鲜的。",
+            "keywords": ["Der", "frisch"]
+          },
+          {
+            "statement": "Das Schnitzel ist lecker und frisch!",
+            "translate": "这炸肉排美味和新鲜！",
+            "keywords": ["Das", "Schnitzel", "lecker", "frisch"]
+          },
+          {
+            "statement": "Der Käse ist gut.",
+            "translate": "奶酪很好。",
+            "keywords": ["Der", "Käse"]
+          },
+          {
+            "statement": "Ich bin satt.",
+            "translate": "我饱了。",
+            "keywords": ["satt"]
+          },
+          {
+            "statement": "Das Brot ist frisch!",
+            "translate": "面包很新鲜！",
+            "keywords": ["Das", "Brott"]
           }
         ]
       }
